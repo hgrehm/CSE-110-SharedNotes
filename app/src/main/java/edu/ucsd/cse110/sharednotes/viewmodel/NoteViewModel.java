@@ -24,7 +24,7 @@ public class NoteViewModel extends AndroidViewModel {
 
     public LiveData<Note> getNote(String title) {
         if (note == null) {
-            note = repo.getSynced(title);
+            note = repo.getRemote(title);
         }
         return note;
     }
