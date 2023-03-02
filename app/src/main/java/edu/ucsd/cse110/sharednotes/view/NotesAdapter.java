@@ -83,7 +83,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> 
 
     @Override
     public long getItemId(int position) {
-        // We don't actually have a unique int/long ID on the Note object, so instead
+        // We don't actually have a unique int/long ID on the Note obfject, so instead
         // we generate a unique ID based on the title. It is possible that two notes
         // could have different titles but the same hash code, but it is beyond unlikely.
         return notes.get(position).title.hashCode();
