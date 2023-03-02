@@ -40,11 +40,6 @@ public class NoteActivity extends AppCompatActivity {
 
         var viewModel = setupViewModel();
         note = viewModel.getNote(title);
-        final ScheduledExecutorService scheduler =
-                Executors.newScheduledThreadPool(1);
-        var dataFuture = scheduler.scheduleAtFixedRate(() -> {
-            note = viewModel.getNote(title);
-        }, 0, 3000, TimeUnit.MILLISECONDS);
         
         // Set up the toolbar.
         setupToolbar(title);

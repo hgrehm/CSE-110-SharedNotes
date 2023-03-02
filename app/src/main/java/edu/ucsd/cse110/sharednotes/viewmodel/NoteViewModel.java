@@ -5,11 +5,6 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import edu.ucsd.cse110.sharednotes.model.Note;
 import edu.ucsd.cse110.sharednotes.model.NoteDatabase;
@@ -28,10 +23,6 @@ public class NoteViewModel extends AndroidViewModel {
     }
 
     public LiveData<Note> getNote(String title) {
-        // TODO: the returned live data should update whenever there is a change in
-        //  the database, or when the server returns a newer version of the note.
-        //  Polling interval: 3s.
-
         if (note == null) {
             note = repo.getSynced(title);
         }

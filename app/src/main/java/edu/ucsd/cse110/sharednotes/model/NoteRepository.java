@@ -1,14 +1,19 @@
 package edu.ucsd.cse110.sharednotes.model;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class NoteRepository {
     private final NoteDao dao;
@@ -89,12 +94,17 @@ public class NoteRepository {
     public LiveData<Note> getRemote(String title) {
         MutableLiveData<Note> note = new MutableLiveData<>();
         var dataFuture = scheduler.scheduleAtFixedRate(() -> {
-            note.postValue(api.getNote(title));
+            Future<Note> futureNote = api.getNoteAsync(title);
+            try {
+                note.postValue(futureNote.get(1, SECONDS));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }, 0, 3000, TimeUnit.MILLISECONDS);
 
         // You may (but don't have to) want to cache the LiveData's for each title, so that
         // you don't create a new polling thread every time you call getRemote with the same title.
-        note.postValue(api.getNote(title));
+
         return note;
     }
 
