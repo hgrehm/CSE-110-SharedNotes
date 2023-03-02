@@ -94,6 +94,7 @@ public class NoteRepository {
 
         // You may (but don't have to) want to cache the LiveData's for each title, so that
         // you don't create a new polling thread every time you call getRemote with the same title.
+        note.postValue(api.getNote(title));
         return note;
     }
 

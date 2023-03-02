@@ -12,6 +12,10 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import edu.ucsd.cse110.sharednotes.R;
 import edu.ucsd.cse110.sharednotes.model.Note;
 import edu.ucsd.cse110.sharednotes.model.NoteDao;
@@ -36,6 +40,11 @@ public class NoteActivity extends AppCompatActivity {
 
         var viewModel = setupViewModel();
         note = viewModel.getNote(title);
+        final ScheduledExecutorService scheduler =
+                Executors.newScheduledThreadPool(1);
+        var dataFuture = scheduler.scheduleAtFixedRate(() -> {
+            note = viewModel.getNote(title);
+        }, 0, 3000, TimeUnit.MILLISECONDS);
         
         // Set up the toolbar.
         setupToolbar(title);
