@@ -79,7 +79,7 @@ public class NoteActivity extends AppCompatActivity {
     }
 
     private void onNoteChanged(Note note) {
-        System.out.println(note.content);
+        System.out.println("Note changed to: " + note.content);
         contentView.setText(note.content);
     }
 

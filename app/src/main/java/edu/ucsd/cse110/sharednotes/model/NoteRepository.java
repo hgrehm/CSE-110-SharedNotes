@@ -96,7 +96,9 @@ public class NoteRepository {
         var dataFuture = scheduler.scheduleAtFixedRate(() -> {
             Future<Note> futureNote = api.getNoteAsync(title);
             try {
-                note.postValue(futureNote.get(1, SECONDS));
+                if (futureNote.get(1, SECONDS).content != null) {
+                    note.postValue(futureNote.get(1, SECONDS));
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
