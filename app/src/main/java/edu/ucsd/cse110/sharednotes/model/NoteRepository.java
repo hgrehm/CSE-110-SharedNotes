@@ -45,7 +45,7 @@ public class NoteRepository {
 
         Observer<Note> updateFromRemote = theirNote -> {
             var ourNote = note.getValue();
-            if (ourNote == null || ourNote.updatedAt < theirNote.updatedAt) {
+            if (theirNote.content != null && (ourNote == null || ourNote.updatedAt < theirNote.updatedAt)) {
                 upsertLocal(theirNote);
             }
         };
@@ -109,6 +109,6 @@ public class NoteRepository {
     }
 
     public void upsertRemote(Note note) {
-        api.putNote(note);
+        api.putNoteAsync(note);
     }
 }

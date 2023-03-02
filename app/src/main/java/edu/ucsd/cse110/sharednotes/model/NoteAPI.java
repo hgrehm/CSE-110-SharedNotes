@@ -10,15 +10,23 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 
 public class NoteAPI {
     private volatile static NoteAPI instance = null;
+    MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     private OkHttpClient client;
 
@@ -85,16 +93,18 @@ public class NoteAPI {
         return future;
     }
 
+    @WorkerThread
     public void putNote(Note note) {
-        var requestBody = new MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addFormDataPart("content", note.content)
-                .addFormDataPart("updated_at", String.valueOf(note.updatedAt))
-                .build();
+        Instant instant = Instant.ofEpochMilli ( note.updatedAt );
+        ZonedDateTime zdt = ZonedDateTime.ofInstant ( instant , ZoneOffset.UTC );
+        String json = "{\r\n" +
+                "  \"content\": \"" + note.content + "\",\r\n" +
+                "  \"updated_at\": \"" + zdt + "\"\r\n" +
+                "}";
 
         Request request = new Request.Builder()
                 .url("https://sharednotes.goto.ucsd.edu/notes/" + note.title)
-                .method("PUT", requestBody)
+                .method("PUT", RequestBody.create(JSON, json))
                 .build();
 
         try (var response = client.newCall(request).execute()) {
@@ -104,5 +114,11 @@ public class NoteAPI {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @AnyThread
+    public void putNoteAsync(Note note) {
+        var executor = Executors.newSingleThreadExecutor();
+        executor.submit(() -> putNote(note));
     }
 }

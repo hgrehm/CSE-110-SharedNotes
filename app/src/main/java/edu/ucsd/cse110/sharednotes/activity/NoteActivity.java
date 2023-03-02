@@ -12,15 +12,10 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import edu.ucsd.cse110.sharednotes.R;
 import edu.ucsd.cse110.sharednotes.model.Note;
 import edu.ucsd.cse110.sharednotes.model.NoteDao;
-import edu.ucsd.cse110.sharednotes.model.NoteDatabase;
-import edu.ucsd.cse110.sharednotes.viewmodel.ListViewModel;
 import edu.ucsd.cse110.sharednotes.viewmodel.NoteViewModel;
 
 public class NoteActivity extends AppCompatActivity {
@@ -84,6 +79,7 @@ public class NoteActivity extends AppCompatActivity {
     }
 
     private void onNoteChanged(Note note) {
+        System.out.println(note.content);
         contentView.setText(note.content);
     }
 
