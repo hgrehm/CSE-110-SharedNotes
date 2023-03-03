@@ -3,7 +3,6 @@ package edu.ucsd.cse110.sharednotes.model;
 import android.util.Log;
 
 import androidx.annotation.AnyThread;
-import androidx.annotation.MainThread;
 import androidx.annotation.WorkerThread;
 
 import com.google.gson.Gson;
@@ -13,13 +12,10 @@ import com.google.gson.JsonParser;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Dictionary;
-import java.util.Hashtable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import okhttp3.MediaType;
-import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -95,11 +91,9 @@ public class NoteAPI {
 
     @WorkerThread
     public void putNote(Note note) {
-        Instant instant = Instant.ofEpochMilli ( note.updatedAt );
-        ZonedDateTime zdt = ZonedDateTime.ofInstant ( instant , ZoneOffset.UTC );
         String json = "{\r\n" +
                 "  \"content\": \"" + note.content + "\",\r\n" +
-                "  \"updated_at\": \"" + zdt + "\"\r\n" +
+                "  \"updated_at\": \"" + String.valueOf(note.version) + "\"\r\n" +
                 "}";
 
         Request request = new Request.Builder()

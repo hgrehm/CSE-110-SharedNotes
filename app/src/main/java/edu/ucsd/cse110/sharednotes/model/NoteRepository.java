@@ -7,11 +7,13 @@ import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -20,6 +22,7 @@ public class NoteRepository {
     private final NoteAPI api;
     private final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(1);
+    private ScheduledFuture<?> poller;
 
     public NoteRepository(NoteDao dao) {
         this.dao = dao;
@@ -45,7 +48,8 @@ public class NoteRepository {
 
         Observer<Note> updateFromRemote = theirNote -> {
             var ourNote = note.getValue();
-            if (theirNote.content != null && (ourNote == null || ourNote.updatedAt < theirNote.updatedAt)) {
+            if (theirNote == null) return;
+            if (ourNote == null || ourNote.version < theirNote.version) {
                 upsertLocal(theirNote);
             }
         };
@@ -76,7 +80,7 @@ public class NoteRepository {
     }
 
     public void upsertLocal(Note note) {
-        note.updatedAt = System.currentTimeMillis();
+        note.version = note.version + 1;
         dao.upsert(note);
     }
 
@@ -93,6 +97,10 @@ public class NoteRepository {
 
     public LiveData<Note> getRemote(String title) {
         MutableLiveData<Note> note = new MutableLiveData<>();
+        // Cancel any previous poller if it exists.
+        if (this.poller != null && !this.poller.isCancelled()) {
+            poller.cancel(true);
+        }
         var dataFuture = scheduler.scheduleAtFixedRate(() -> {
             Future<Note> futureNote = api.getNoteAsync(title);
             try {

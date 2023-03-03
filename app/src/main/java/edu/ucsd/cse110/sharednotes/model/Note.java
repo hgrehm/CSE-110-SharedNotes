@@ -29,13 +29,14 @@ public class Note {
      * Defaults to 0 (Jan 1, 1970), so that if a note already exists remotely, its content is
      * always preferred to a new empty note.
      */
-    @SerializedName(value = "updated_at", alternate = "updatedAt")
-    public long updatedAt = 0;
+    @SerializedName(value = "version")
+    public long version = 0;
 
     /** General constructor for a note. */
     public Note(@NonNull String title, @NonNull String content) {
         this.title = title;
         this.content = content;
+        this.version = 0;
     }
 
     public static Note fromJSON(String json) {
