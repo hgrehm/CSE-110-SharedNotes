@@ -30,6 +30,7 @@ public class NoteViewModel extends AndroidViewModel {
     }
 
     public void save(Note note) {
+        System.out.println("upserting " + note);
         repo.upsertSynced(note);
     }
 }

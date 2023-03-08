@@ -63,6 +63,8 @@ public class NoteRepository {
     }
 
     public void upsertSynced(Note note) {
+        System.out.println("upserting synced");
+        note.version = note.version + 1;
         upsertLocal(note);
         upsertRemote(note);
     }
@@ -80,7 +82,6 @@ public class NoteRepository {
     }
 
     public void upsertLocal(Note note) {
-        note.version = note.version + 1;
         dao.upsert(note);
     }
 
@@ -119,6 +120,7 @@ public class NoteRepository {
     }
 
     public void upsertRemote(Note note) {
+        System.out.println("remote "+ note.version);
         api.putNoteAsync(note);
     }
 }

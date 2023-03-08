@@ -93,7 +93,7 @@ public class NoteAPI {
     public void putNote(Note note) {
         String json = "{\r\n" +
                 "  \"content\": \"" + note.content + "\",\r\n" +
-                "  \"updated_at\": \"" + String.valueOf(note.version) + "\"\r\n" +
+                "  \"version\": \"" + String.valueOf(note.version) + "\"\r\n" +
                 "}";
 
         Request request = new Request.Builder()
