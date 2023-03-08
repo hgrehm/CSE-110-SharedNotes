@@ -23,6 +23,7 @@ public class NoteRepository {
     private final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(1);
     private ScheduledFuture<?> poller;
+    private MediatorLiveData<Note> note;
 
     public NoteRepository(NoteDao dao) {
         this.dao = dao;
@@ -44,13 +45,16 @@ public class NoteRepository {
      * @return a LiveData object that will be updated when the note is updated locally or remotely.
      */
     public LiveData<Note> getSynced(String title) {
-        var note = new MediatorLiveData<Note>();
+        note = new MediatorLiveData<Note>();
 
         Observer<Note> updateFromRemote = theirNote -> {
             var ourNote = note.getValue();
+            System.out.println(ourNote.content);
             if (theirNote == null) return;
+            System.out.println(ourNote.version);
             if (ourNote == null || ourNote.version < theirNote.version) {
                 upsertLocal(theirNote);
+                System.out.println("upserting theirs");
             }
         };
 
@@ -97,15 +101,14 @@ public class NoteRepository {
     // ==============
 
     public LiveData<Note> getRemote(String title) {
-        MutableLiveData<Note> note = new MutableLiveData<>();
         // Cancel any previous poller if it exists.
         if (this.poller != null && !this.poller.isCancelled()) {
             poller.cancel(true);
         }
-        var dataFuture = scheduler.scheduleAtFixedRate(() -> {
+        var poller = scheduler.scheduleAtFixedRate(() -> {
             Future<Note> futureNote = api.getNoteAsync(title);
             try {
-                if (futureNote.get(1, SECONDS).content != null) {
+                if (futureNote.get(3, SECONDS).content != null) {
                     note.postValue(futureNote.get(1, SECONDS));
                 }
             } catch (Exception e) {
